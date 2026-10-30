@@ -1,0 +1,51 @@
+name: chayitong-backend
+
+services:
+  mysql:
+    # 固定为现有容器的 MySQL 8.0.46 镜像，不升级已有数据库。
+    image: mysql@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b
+    container_name: chayitong
+    restart: "no"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请配置 MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: chayitong
+      MYSQL_USER: chayitong
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD:?请配置 MYSQL_APP_PASSWORD}
+    ports:
+      - "${MYSQL_PORT:-3309}:3306"
+    volumes:
+      - type: bind
+        source: ${MYSQL_DATA_DIR:-D:/docker-data/chayitong/mysql}
+        target: /var/lib/mysql
+        bind:
+          create_host_path: false
+    healthcheck:
+      # $$ 让变量留到容器内展开；通过环境变量传递密码。
+      test:
+        - CMD-SHELL
+        - >-
+          MYSQL_PWD="$${MYSQL_PASSWORD}" mysql --protocol=TCP
+          --host=127.0.0.1 --user="$${MYSQL_USER}"
+          --database="$${MYSQL_DATABASE}" --connect-timeout=3
+          --silent --skip-column-names --execute='SELECT 1' >/dev/null 2>&1
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 12
+
+  # 当前默认只启动数据库；启用 backend profile 才启动 Java。
+  chayitongbackend:
+    profiles: [backend]
+    image: chayitongbackend:local
+    build:
+      context: ./chayitong-backend
+      dockerfile: ../Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/chayitong
+      SPRING_DATASOURCE_USERNAME: chayitong
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_APP_PASSWORD:?请配置 MYSQL_APP_PASSWORD}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy

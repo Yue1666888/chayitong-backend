@@ -1,0 +1,4 @@
+# 构建上下文只发送已打包的应用，不发送 .env 或源码。
+**
+!target/
+!target/chayitong-backend-0.0.1-SNAPSHOT.jar

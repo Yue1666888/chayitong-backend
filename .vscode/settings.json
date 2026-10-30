@@ -1,0 +1,8 @@
+{
+  "python.analysis.stubPath": "C:\\Users\\zhangyue\\.kendryte\\k230_canmv_pylance\\9015f4638741f939\\typings",
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "python.analysis.extraPaths": [
+    "C:\\Users\\zhangyue\\.kendryte\\k230_canmv_stubs\\ab3b4a75e222a7b25f80ad660bde1abcc590035a"
+  ]
+}
