@@ -44,7 +44,7 @@ class ExampleController {
   @GetMapping("/api/teas")
   public TeaPageResponse listTeas(
       @Valid @ModelAttribute TeaFilterRequest filter,
-      @Valid @ModelAttribute TeaPageRequest pagination) {
+      @Valid @ModelAttribute PageRequest pagination) {
     return teaService.listTeas(filter.getType(), filter.getKeyword(),
         pagination.getPage(), pagination.getPageSize());
   }

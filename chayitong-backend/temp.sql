@@ -242,3 +242,16 @@ FROM
   users
 WHERE
   id = 'user001';
+
+SELECT
+  id,
+  title,
+  category,
+  published_at
+FROM
+  articles
+WHERE
+  status = 'published'
+ORDER BY
+  published_at DESC,
+  id ASC;

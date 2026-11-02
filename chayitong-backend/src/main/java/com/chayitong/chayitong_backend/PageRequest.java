@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 // 将 URL 中的 page、pageSize 查询参数绑定到一个对象中。
-public class TeaPageRequest {
+public class PageRequest {
   @Min(value = 1, message = "页码不能小于 1")
   private int page = 1;
 

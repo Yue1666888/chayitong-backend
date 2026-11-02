@@ -22,7 +22,7 @@ public class UserController {
   @GetMapping("/api/users/{userId}/favorites")
   public UserFavoritesResponse getFavorites(
       @PathVariable("userId") String userId,
-      @Valid @ModelAttribute TeaPageRequest pagination) {
+      @Valid @ModelAttribute PageRequest pagination) {
     UserFavoritesResponse response = userService.findFavorites(
         userId, pagination.getPage(), pagination.getPageSize());
     if (response == null) {

@@ -57,6 +57,8 @@ public class SecurityConfig {
             .requestMatchers("/api/users/**").authenticated()
             .requestMatchers(HttpMethod.GET, "/api/teas", "/api/teas/**").permitAll()
             .requestMatchers(HttpMethod.HEAD, "/api/teas", "/api/teas/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/articles", "/api/articles/{id}").permitAll()
+            .requestMatchers(HttpMethod.HEAD, "/api/articles", "/api/articles/{id}").permitAll()
             // 包括批量新增及课堂 POST 预览；CSRF 校验继续生效。
             .requestMatchers(HttpMethod.POST, "/api/teas", "/api/teas/**").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/teas", "/api/teas/**").hasRole("ADMIN")

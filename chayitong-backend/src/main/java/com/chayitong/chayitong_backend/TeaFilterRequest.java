@@ -2,7 +2,7 @@ package com.chayitong.chayitong_backend;
 
 import jakarta.validation.constraints.Size;
 
-// 搜索条件与 TeaPageRequest 的分页参数分别绑定，各自负责自己的字段。
+// 搜索条件与 PageRequest 的分页参数分别绑定，各自负责自己的字段。
 public class TeaFilterRequest {
   private String type;
 

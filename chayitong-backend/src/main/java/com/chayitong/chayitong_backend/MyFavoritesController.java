@@ -23,7 +23,7 @@ public class MyFavoritesController {
   @GetMapping("/api/me/favorites")
   public UserFavoritesResponse getFavorites(
       @AuthenticationPrincipal LoginUser currentUser,
-      @Valid @ModelAttribute TeaPageRequest pagination) {
+      @Valid @ModelAttribute PageRequest pagination) {
     // 用户编号来自已经验证的登录身份，调用方只需要传分页参数。
     UserFavoritesResponse response = userService.findFavorites(
         currentUser.getUserId(), pagination.getPage(), pagination.getPageSize());

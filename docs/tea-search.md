@@ -51,7 +51,7 @@ LIKE 用于模式匹配，% 表示任意数量的字符（包括零个）：
 
 ## Java 中的调用顺序
 
-1. ExampleController 将 URL 中的 type、keyword 绑定给 TeaFilterRequest；分页仍绑定到 TeaPageRequest。
+1. ExampleController 将 URL 中的 type、keyword 绑定给 TeaFilterRequest；分页绑定到通用 PageRequest（原名 TeaPageRequest）。
 2. @Valid 校验关键词长度和分页参数。
 3. TeaService 去除关键词首尾空白；没有关键词时继续使用原来的查询路径。
 4. 有关键词时，TeaRepository.countByKeyword 查询总数，findByKeyword 查询当前页。
