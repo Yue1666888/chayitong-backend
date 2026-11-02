@@ -48,6 +48,34 @@ public class TeaRepository {
         offset);
   }
 
+  public long countByKeyword(String keyword, String type) {
+    return jdbcTemplate.queryForObject(
+        """
+        SELECT COUNT(*) FROM teas
+        WHERE name LIKE ? ESCAPE '!'
+          AND (? IS NULL OR type = ?)
+        """,
+        Long.class, containsPattern(keyword), type, type);
+  }
+
+  public List<TeaResponse> findByKeyword(String keyword, String type, int limit, long offset) {
+    // 总数查询与列表查询使用相同的过滤条件，分页只影响列表。
+    return jdbcTemplate.query(
+        """
+        SELECT id, name, type FROM teas
+        WHERE name LIKE ? ESCAPE '!'
+          AND (? IS NULL OR type = ?)
+        ORDER BY id LIMIT ? OFFSET ?
+        """,
+        teaRowMapper, containsPattern(keyword), type, type, limit, offset);
+  }
+
+  private String containsPattern(String keyword) {
+    // ? 防止 SQL 注入；另将 LIKE 的特殊字符转成普通字符，按用户输入的原文搜索。
+    String escaped = keyword.replace("!", "!!").replace("%", "!%").replace("_", "!_");
+    return "%" + escaped + "%";
+  }
+
   public TeaResponse findById(String id) {
     List<TeaResponse> teas = jdbcTemplate.query(
         "SELECT id, name, type FROM teas WHERE id = ?",

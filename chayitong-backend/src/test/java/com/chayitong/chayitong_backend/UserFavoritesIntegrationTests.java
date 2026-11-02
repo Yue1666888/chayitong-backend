@@ -18,7 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+// SQL 和事务业务测试；完整认证和归属规则由 SessionSecurityIntegrationTests 验证。
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @EnabledIfSystemProperty(named = "db.integration", matches = "true")
 class UserFavoritesIntegrationTests {

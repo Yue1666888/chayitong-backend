@@ -23,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 // 显式运行：mvn -Ddb.integration=true test。测试只操作事务内的临时茶叶。
 @SpringBootTest
-@AutoConfigureMockMvc
+// SQL 和事务业务测试；完整认证和归属规则由 SessionSecurityIntegrationTests 验证。
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @EnabledIfSystemProperty(named = "db.integration", matches = "true")
 class TeaDeletionIntegrationTests {

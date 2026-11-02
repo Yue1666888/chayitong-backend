@@ -23,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 // 显式运行：mvn -Ddb.integration=true test。需要本地 MySQL 和 teas 表。
 // MockMvc 与测试使用同一线程；每个测试完成后回滚，不保留测试数据。
 @SpringBootTest
-@AutoConfigureMockMvc
+// SQL 和事务业务测试；完整认证和归属规则由 SessionSecurityIntegrationTests 验证。
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @EnabledIfSystemProperty(named = "db.integration", matches = "true")
 class TeaCreationIntegrationTests {

@@ -15,9 +15,17 @@ public class TeaService {
   }
 
   @Transactional(readOnly = true)
-  public TeaPageResponse listTeas(String type, int page, int pageSize) {
+  public TeaPageResponse listTeas(String type, String keyword, int page, int pageSize) {
     // 先转成 long，避免大页码乘以 pageSize 时发生 int 溢出。
     long offset = ((long) page - 1) * pageSize;
+    String normalizedKeyword = keyword == null ? "" : keyword.strip();
+    if (!normalizedKeyword.isEmpty()) {
+      String typeFilter = type == null || type.isBlank() ? null : type;
+      long total = teaRepository.countByKeyword(normalizedKeyword, typeFilter);
+      return new TeaPageResponse(page, pageSize, total,
+          teaRepository.findByKeyword(normalizedKeyword, typeFilter, pageSize, offset));
+    }
+
     if (type == null || type.isBlank()) {
       long total = teaRepository.countAll();
       return new TeaPageResponse(page, pageSize, total,

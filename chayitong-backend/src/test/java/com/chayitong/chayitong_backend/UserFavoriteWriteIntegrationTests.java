@@ -24,7 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 // 无测试外层事务：验证真实提交及重复收藏后事务仍能正常结束。
 // 只创建临时用户和茶叶，测试结束后按这些编号清理。
 @SpringBootTest
-@AutoConfigureMockMvc
+// SQL 和事务业务测试；完整认证和归属规则由 SessionSecurityIntegrationTests 验证。
+@AutoConfigureMockMvc(addFilters = false)
 @EnabledIfSystemProperty(named = "db.integration", matches = "true")
 class UserFavoriteWriteIntegrationTests {
 

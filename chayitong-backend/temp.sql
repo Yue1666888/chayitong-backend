@@ -195,3 +195,50 @@ WHERE
   f.user_id = 'user001'
 ORDER BY
   f.tea_id;
+
+INSERT INTO
+  user_credentials (user_id, login_name, password_hash)
+VALUES
+  (
+    'user001',
+    'xiaolin',
+    '{bcrypt}$2a$10$6ZbC1AwJdWUQ6JGvCGaRP.QztX6bqZ72wr/5M8.goltAC1l/1mtsi'
+  );
+
+SELECT
+  DATABASE();
+
+SHOW COLUMNS
+FROM
+  users LIKE 'role';
+
+ALTER TABLE users
+ADD COLUMN role VARCHAR(16) COLLATE utf8mb4_bin NOT NULL DEFAULT 'USER',
+ADD CONSTRAINT chk_users_role CHECK (role IN ('USER', 'ADMIN'));
+
+SELECT
+  u.id,
+  u.display_name,
+  u.role,
+  c.login_name
+FROM
+  users AS u
+  LEFT JOIN user_credentials AS c ON c.user_id = u.id
+ORDER BY
+  u.id;
+
+START TRANSACTION;
+
+UPDATE users
+SET role = 'ADMIN'
+WHERE
+  id = 'user001';
+
+SELECT
+  id,
+  display_name,
+  role
+FROM
+  users
+WHERE
+  id = 'user001';

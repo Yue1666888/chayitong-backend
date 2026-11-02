@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 // 在本地 MySQL 验证分页；所有临时数据在每个测试后回滚。
 @SpringBootTest
-@AutoConfigureMockMvc
+// SQL 和事务业务测试；完整认证和归属规则由 SessionSecurityIntegrationTests 验证。
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @EnabledIfSystemProperty(named = "db.integration", matches = "true")
 class TeaPaginationIntegrationTests {

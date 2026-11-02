@@ -23,7 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 // 不在测试外层开启事务，以便真正验证 Service 的提交和回滚。
 // 所有临时编号均在测试结束后清理，不修改原有业务记录。
 @SpringBootTest
-@AutoConfigureMockMvc
+// SQL 和事务业务测试；完整认证和归属规则由 SessionSecurityIntegrationTests 验证。
+@AutoConfigureMockMvc(addFilters = false)
 @EnabledIfSystemProperty(named = "db.integration", matches = "true")
 class TeaBatchCreationIntegrationTests {
 

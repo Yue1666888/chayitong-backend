@@ -12,6 +12,10 @@ public class UserRepository {
     this.jdbcTemplate = jdbcTemplate;
   }
 
+  public void insert(String id, String displayName) {
+    jdbcTemplate.update("INSERT INTO users (id, display_name) VALUES (?, ?)", id, displayName);
+  }
+
   public UserResponse findById(String id) {
     List<UserResponse> users = jdbcTemplate.query(
         "SELECT id, display_name FROM users WHERE id = ?",

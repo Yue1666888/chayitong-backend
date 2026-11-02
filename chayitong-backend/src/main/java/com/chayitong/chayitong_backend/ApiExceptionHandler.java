@@ -22,7 +22,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(DuplicateKeyException.class)
   public ResponseEntity<ApiErrorResponse> handleDuplicateKey(DuplicateKeyException exception) {
     ApiErrorResponse body = new ApiErrorResponse(
-        "DATA_CONFLICT", "数据与现有记录冲突，请检查编号是否重复", new HashMap<>());
+        "DATA_CONFLICT", "数据与现有记录冲突，请检查编号或登录名是否重复", new HashMap<>());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
   }
 

@@ -43,9 +43,10 @@ class ExampleController {
 
   @GetMapping("/api/teas")
   public TeaPageResponse listTeas(
-      @RequestParam(value = "type", required = false) String type,
+      @Valid @ModelAttribute TeaFilterRequest filter,
       @Valid @ModelAttribute TeaPageRequest pagination) {
-    return teaService.listTeas(type, pagination.getPage(), pagination.getPageSize());
+    return teaService.listTeas(filter.getType(), filter.getKeyword(),
+        pagination.getPage(), pagination.getPageSize());
   }
 
   @PostMapping(value = "/api/teas", consumes = MediaType.APPLICATION_JSON_VALUE)
