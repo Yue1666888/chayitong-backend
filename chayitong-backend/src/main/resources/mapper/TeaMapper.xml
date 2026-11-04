@@ -11,7 +11,25 @@
     </constructor>
   </resultMap>
 
-  <select id="findById" resultMap="teaResult">
-    SELECT id, name, type FROM teas WHERE id = #{id}
+  <sql id="teaFilters">
+    <where>
+      <if test="type != null">
+        AND type = #{type}
+      </if>
+      <if test="namePattern != null">
+        AND name LIKE #{namePattern} ESCAPE '!'
+      </if>
+    </where>
+  </sql>
+
+  <select id="countMatching" resultType="long">
+    SELECT COUNT(*) FROM teas
+    <include refid="teaFilters" />
+  </select>
+
+  <select id="findPage" resultMap="teaResult">
+    SELECT id, name, type FROM teas
+    <include refid="teaFilters" />
+    ORDER BY id LIMIT #{limit} OFFSET #{offset}
   </select>
 </mapper>

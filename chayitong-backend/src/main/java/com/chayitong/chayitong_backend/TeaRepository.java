@@ -21,55 +21,6 @@ public class TeaRepository {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  public long countAll() {
-    return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM teas", Long.class);
-  }
-
-  public long countByType(String type) {
-    return jdbcTemplate.queryForObject(
-        "SELECT COUNT(*) FROM teas WHERE type = ?", Long.class, type);
-  }
-
-  public List<TeaResponse> findAll(int limit, long offset) {
-    return jdbcTemplate.query(
-        "SELECT id, name, type FROM teas ORDER BY id LIMIT ? OFFSET ?",
-        teaRowMapper,
-        limit,
-        offset);
-  }
-
-  public List<TeaResponse> findByType(String type, int limit, long offset) {
-    // ? 绑定参数值，客户端输入不会被拼接成 SQL 语句。
-    return jdbcTemplate.query(
-        "SELECT id, name, type FROM teas WHERE type = ? ORDER BY id LIMIT ? OFFSET ?",
-        teaRowMapper,
-        type,
-        limit,
-        offset);
-  }
-
-  public long countByKeyword(String keyword, String type) {
-    return jdbcTemplate.queryForObject(
-        """
-        SELECT COUNT(*) FROM teas
-        WHERE name LIKE ? ESCAPE '!'
-          AND (? IS NULL OR type = ?)
-        """,
-        Long.class, SqlLikePattern.contains(keyword), type, type);
-  }
-
-  public List<TeaResponse> findByKeyword(String keyword, String type, int limit, long offset) {
-    // 总数查询与列表查询使用相同的过滤条件，分页只影响列表。
-    return jdbcTemplate.query(
-        """
-        SELECT id, name, type FROM teas
-        WHERE name LIKE ? ESCAPE '!'
-          AND (? IS NULL OR type = ?)
-        ORDER BY id LIMIT ? OFFSET ?
-        """,
-        teaRowMapper, SqlLikePattern.contains(keyword), type, type, limit, offset);
-  }
-
   public TeaResponse findById(String id) {
     List<TeaResponse> teas = jdbcTemplate.query(
         "SELECT id, name, type FROM teas WHERE id = ?",
