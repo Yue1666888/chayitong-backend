@@ -9,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeaService {
 
   private final TeaRepository teaRepository;
+  private final TeaMapper teaMapper;
 
-  public TeaService(TeaRepository teaRepository) {
+  public TeaService(TeaRepository teaRepository, TeaMapper teaMapper) {
     this.teaRepository = teaRepository;
+    this.teaMapper = teaMapper;
   }
 
   @Transactional(readOnly = true)
@@ -39,7 +41,7 @@ public class TeaService {
 
   // 只返回查询结果；HTTP 状态码由控制器决定。
   public TeaResponse findById(String id) {
-    return teaRepository.findById(id);
+    return teaMapper.findById(id);
   }
 
   public TeaResponse createTea(String id, String name, String type) {

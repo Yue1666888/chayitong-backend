@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chayitong.chayitong_backend.TeaMapper">
+  <resultMap id="teaResult" type="com.chayitong.chayitong_backend.TeaResponse">
+    <constructor>
+      <idArg column="id" javaType="java.lang.String" />
+      <arg column="name" javaType="java.lang.String" />
+      <arg column="type" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+
+  <select id="findById" resultMap="teaResult">
+    SELECT id, name, type FROM teas WHERE id = #{id}
+  </select>
+</mapper>
