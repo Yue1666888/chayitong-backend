@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.chayitong.chayitong_backend.content.ParagraphBlock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,11 +33,13 @@ class ArticleDetailIntegrationTests {
   @Autowired private MockMvc mockMvc;
   @Autowired private JdbcTemplate jdbcTemplate;
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private ArticleService articleService;
 
   private String publishedId;
   private String draftId;
   private String emptyBodyId;
   private String category;
+  private String bodyJson;
   private final String paragraph = "正文包含\"引号\"、换行\n和反斜线\\。";
 
   @BeforeEach
@@ -46,12 +49,15 @@ class ArticleDetailIntegrationTests {
     draftId = "detail_" + suffix + "_draft";
     emptyBodyId = "detail_" + suffix + "_empty";
     category = "detail_" + suffix;
-    String body = objectMapper.writeValueAsString(List.of(
+    bodyJson = objectMapper.writeValueAsString(List.of(
         Map.of("type", "heading", "level", 3, "text", "文章标题块"),
         Map.of("type", "paragraph", "text", paragraph),
         Map.of("type", "list", "ordered", false, "items", List.of("第一项", "第二项")),
-        Map.of("type", "image", "src", "https://example.com/article.jpg", "alt", "练习图片")));
-    insert(publishedId, "published", body, LocalDateTime.of(2026, 11, 1, 9, 0));
+        Map.of("type", "image", "src", "https://example.com/article.jpg", "alt", "练习图片"),
+        Map.of("type", "quote", "text", "引用内容", "source", "练习来源"),
+        Map.of("type", "steps", "items", List.of(Map.of("title", "第一步", "text", "步骤说明"))),
+        Map.of("type", "tip", "tone", "info", "title", "练习提示", "text", "提示内容")));
+    insert(publishedId, "published", bodyJson, LocalDateTime.of(2026, 11, 1, 9, 0));
     insert(draftId, "draft", "[{\"type\":\"paragraph\",\"text\":\"草稿正文不能公开\"}]", null);
     insert(emptyBodyId, "published", "[]", null);
   }
@@ -73,7 +79,7 @@ class ArticleDetailIntegrationTests {
 
   @Test
   void anonymousDetailReturnsStructuredContentBlocksAndPreservesTheirValues() throws Exception {
-    mockMvc.perform(get("/api/articles/{id}", publishedId))
+    var result = mockMvc.perform(get("/api/articles/{id}", publishedId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(publishedId))
         .andExpect(jsonPath("$.title").value("详情测试文章"))
@@ -82,14 +88,20 @@ class ArticleDetailIntegrationTests {
         .andExpect(jsonPath("$.cover").value(nullValue()))
         .andExpect(jsonPath("$.publishedAt").value("2026-11-01T09:00:00"))
         .andExpect(jsonPath("$.contentBlocks").isArray())
-        .andExpect(jsonPath("$.contentBlocks.length()").value(4))
+        .andExpect(jsonPath("$.contentBlocks.length()").value(7))
         .andExpect(jsonPath("$.contentBlocks[0].type").value("heading"))
         .andExpect(jsonPath("$.contentBlocks[0].level").value(3))
         .andExpect(jsonPath("$.contentBlocks[1].text").value(paragraph))
         .andExpect(jsonPath("$.contentBlocks[2].ordered").value(false))
         .andExpect(jsonPath("$.contentBlocks[2].items[1]").value("第二项"))
         .andExpect(jsonPath("$.contentBlocks[3].src").value("https://example.com/article.jpg"))
-        .andExpect(jsonPath("$.content_blocks").doesNotExist());
+        .andExpect(jsonPath("$.content_blocks").doesNotExist()).andReturn();
+    // 七种模型往返后保留原有 JSON 字段和值，不额外补上缺省的可选字段。
+    assertThat(objectMapper.readTree(result.getResponse().getContentAsString()).get("contentBlocks"))
+        .isEqualTo(objectMapper.readTree(bodyJson));
+    var paragraphBlock = articleService.findPublishedById(publishedId).getContentBlocks().get(1);
+    assertThat(paragraphBlock).isInstanceOf(ParagraphBlock.class);
+    assertThat(((ParagraphBlock) paragraphBlock).getText()).isEqualTo(paragraph);
   }
 
   @Test
@@ -129,5 +141,35 @@ class ArticleDetailIntegrationTests {
     mockMvc.perform(head("/api/articles/{id}", publishedId))
         .andExpect(status().isOk());
     mockMvc.perform(head("/api/articles/{id}", draftId)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void invalidStoredContentReturnsAControlledServerErrorWithoutCoercingOrDroppingFields() throws Exception {
+    String[] invalidBodies = {
+        "[{\"type\":\"paragraph\",\"text\":123}]",
+        "[{\"type\":\"paragraph\"}]",
+        "[{\"type\":\"paragraph\",\"text\":null}]",
+        "[{\"type\":\"paragraph\",\"text\":\"   \"}]",
+        "[{\"type\":\"video\",\"src\":\"https://example.com/video\"}]",
+        "[{\"text\":\"缺少类型\"}]",
+        "[null]",
+        "[{\"type\":\"image\",\"src\":\"https://example.com/image.jpg\",\"text\":\"意外字段\"}]",
+        "[{\"type\":\"heading\",\"level\":\"3\",\"text\":\"标题\"}]",
+        "[{\"type\":\"heading\",\"level\":7,\"text\":\"标题\"}]",
+        "[{\"type\":\"list\",\"ordered\":\"false\",\"items\":[\"条目\"]}]",
+        "[{\"type\":\"list\",\"ordered\":false,\"items\":[123]}]",
+        "[{\"type\":\"steps\",\"items\":[{\"title\":\"步骤\",\"text\":\"   \"}]}]"
+    };
+    for (String body : invalidBodies) {
+      // 只修改当前测试事务生成的文章；这些值虽是 JSON 数组，但不满足正文业务模型。
+      jdbcTemplate.update("UPDATE articles SET content_blocks = ? WHERE id = ?", body, publishedId);
+      mockMvc.perform(get("/api/articles/{id}", publishedId))
+          .andExpect(status().isInternalServerError())
+          .andExpect(jsonPath("$.code").value("ARTICLE_CONTENT_INVALID"))
+          .andExpect(jsonPath("$.message").value("文章正文格式异常，请联系管理员"))
+          .andExpect(jsonPath("$.contentBlocks").doesNotExist());
+    }
+    // 摘要列表不读取正文，不会因为某篇正文不符合模型而一起失败。
+    mockMvc.perform(get("/api/articles")).andExpect(status().isOk());
   }
 }

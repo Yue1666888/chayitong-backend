@@ -1,5 +1,6 @@
 package com.chayitong.chayitong_backend;
 
+import com.chayitong.chayitong_backend.content.InvalidArticleContentException;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,6 +19,39 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+
+  @ExceptionHandler(PublishedArticleDeleteException.class)
+  public ResponseEntity<ApiErrorResponse> handlePublishedArticleDelete(PublishedArticleDeleteException exception) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(new ApiErrorResponse("ARTICLE_DELETE_REQUIRES_DRAFT", exception.getMessage(), Map.of()));
+  }
+
+  @ExceptionHandler(PublishedArticleEditException.class)
+  public ResponseEntity<ApiErrorResponse> handlePublishedArticleEdit(PublishedArticleEditException exception) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(new ApiErrorResponse("ARTICLE_EDIT_REQUIRES_DRAFT", exception.getMessage(), Map.of()));
+  }
+
+  @ExceptionHandler(InvalidArticleDraftContentException.class)
+  public ResponseEntity<ApiErrorResponse> handleInvalidDraftContent(InvalidArticleDraftContentException exception) {
+    return ResponseEntity.badRequest().body(new ApiErrorResponse(
+        "VALIDATION_FAILED", "请求参数校验失败", Map.of("contentBlocks", exception.getMessage())));
+  }
+
+  @ExceptionHandler(ArticleNotReadyException.class)
+  public ResponseEntity<ApiErrorResponse> handleArticleNotReady(ArticleNotReadyException exception) {
+    ApiErrorResponse body = new ApiErrorResponse(
+        "ARTICLE_NOT_READY", exception.getMessage(), new HashMap<>());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+  }
+
+  @ExceptionHandler(InvalidArticleContentException.class)
+  public ResponseEntity<ApiErrorResponse> handleInvalidArticleContent(InvalidArticleContentException exception) {
+    ApiErrorResponse body = new ApiErrorResponse(
+        "ARTICLE_CONTENT_INVALID", "文章正文格式异常，请联系管理员", new HashMap<>());
+    // 出错的是服务端已有数据，不是本次 GET 请求参数，因此返回 500。
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+  }
 
   @ExceptionHandler(DuplicateKeyException.class)
   public ResponseEntity<ApiErrorResponse> handleDuplicateKey(DuplicateKeyException exception) {

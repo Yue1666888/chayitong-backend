@@ -1,7 +1,7 @@
 # 文章模块，第 2 步：公开分页列表
 
 前提：已手动执行 articles 建表和演示数据脚本，并提交事务。
-本页讲解公开列表；已完成的详情接口和正文 JSON 读取见 articles-detail.md。
+本页讲解公开列表；详情见 articles-detail.md，新增的分类/关键词组合查询见 articles-search.md。
 
 ## 接口
 
@@ -17,7 +17,8 @@ page 默认 1，pageSize 默认 10，最大 100。
 - publishedAt：数据库 published_at 映射后的日期时间。
 
 列表不查询 content_blocks，也不返回整篇正文。
-当前只支持分页；分类和关键词筛选后续再加，status 不能由客户端改变。
+当前也支持可选 category、keyword；keyword 匹配标题或摘要，具体规则见 articles-search.md。
+status 仍固定为 published，不能由客户端改变。
 
 ## 核心 SQL
 
@@ -25,11 +26,16 @@ page 默认 1，pageSize 默认 10，最大 100。
 SELECT id, title, summary, category, cover, published_at
 FROM articles
 WHERE status = 'published'
+  AND (:category IS NULL OR category = :category)
+  AND (:keywordPattern IS NULL OR (
+    title LIKE :keywordPattern ESCAPE '!'
+    OR summary LIKE :keywordPattern ESCAPE '!'
+  ))
 ORDER BY published_at DESC, id ASC
-LIMIT ? OFFSET ?;
+LIMIT :limit OFFSET :offset;
 ```
 
-COUNT 查询也带相同的 status 条件，所以 total 只统计已发布文章。
+命名参数由 Java 绑定；未传筛选条件时绑定 NULL。COUNT 使用相同条件，total 只统计符合筛选的已发布文章。
 同一发布时间用 id 排序，保证记录顺序稳定。
 超出范围的页返回 200 和空 items，保留正确的 total。
 

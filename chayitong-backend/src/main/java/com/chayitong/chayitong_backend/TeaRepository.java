@@ -55,7 +55,7 @@ public class TeaRepository {
         WHERE name LIKE ? ESCAPE '!'
           AND (? IS NULL OR type = ?)
         """,
-        Long.class, containsPattern(keyword), type, type);
+        Long.class, SqlLikePattern.contains(keyword), type, type);
   }
 
   public List<TeaResponse> findByKeyword(String keyword, String type, int limit, long offset) {
@@ -67,13 +67,7 @@ public class TeaRepository {
           AND (? IS NULL OR type = ?)
         ORDER BY id LIMIT ? OFFSET ?
         """,
-        teaRowMapper, containsPattern(keyword), type, type, limit, offset);
-  }
-
-  private String containsPattern(String keyword) {
-    // ? 防止 SQL 注入；另将 LIKE 的特殊字符转成普通字符，按用户输入的原文搜索。
-    String escaped = keyword.replace("!", "!!").replace("%", "!%").replace("_", "!_");
-    return "%" + escaped + "%";
+        teaRowMapper, SqlLikePattern.contains(keyword), type, type, limit, offset);
   }
 
   public TeaResponse findById(String id) {

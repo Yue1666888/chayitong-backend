@@ -59,6 +59,13 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.HEAD, "/api/teas", "/api/teas/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/articles", "/api/articles/{id}").permitAll()
             .requestMatchers(HttpMethod.HEAD, "/api/articles", "/api/articles/{id}").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/admin/articles/{id}").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.HEAD, "/api/admin/articles/{id}").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/api/admin/articles").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/api/admin/articles/{id}").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/admin/articles/{id}").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/api/admin/articles/{id}/publication").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/admin/articles/{id}/publication").hasRole("ADMIN")
             // 包括批量新增及课堂 POST 预览；CSRF 校验继续生效。
             .requestMatchers(HttpMethod.POST, "/api/teas", "/api/teas/**").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/teas", "/api/teas/**").hasRole("ADMIN")

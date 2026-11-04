@@ -1,7 +1,8 @@
 package com.chayitong.chayitong_backend;
 
 import java.time.LocalDateTime;
-import tools.jackson.databind.JsonNode;
+import com.chayitong.chayitong_backend.content.ContentBlock;
+import java.util.List;
 
 public class ArticleDetailResponse {
   private final String id;
@@ -10,10 +11,10 @@ public class ArticleDetailResponse {
   private final String category;
   private final String cover;
   private final LocalDateTime publishedAt;
-  private final JsonNode contentBlocks;
+  private final List<ContentBlock> contentBlocks;
 
   public ArticleDetailResponse(String id, String title, String summary, String category,
-      String cover, LocalDateTime publishedAt, JsonNode contentBlocks) {
+      String cover, LocalDateTime publishedAt, List<ContentBlock> contentBlocks) {
     this.id = id;
     this.title = title;
     this.summary = summary;
@@ -47,7 +48,7 @@ public class ArticleDetailResponse {
     return publishedAt;
   }
 
-  public JsonNode getContentBlocks() {
+  public List<ContentBlock> getContentBlocks() {
     return contentBlocks;
   }
 }

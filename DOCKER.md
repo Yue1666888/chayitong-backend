@@ -25,7 +25,7 @@ compose.ps1 会自动定位两处文件，避免 Compose 默认找不到内层 .
 - 真实 .env 保留原值，仍由内层项目的 .gitignore 排除。
 
 DBCode 填写 MySQL、127.0.0.1、3309、账号 chayitong、数据库 chayitong。
-目前还没有业务表，建表和练习 SQL 仍由你手动完成。
+当前已有 `teas`、`users`、`tea_favorites`、`user_credentials` 和 `articles`。空库的手动建表顺序见[后端验收](docs/backend-acceptance.md#数据库准备)。
 
 ## 账号、名称与密码对应关系
 

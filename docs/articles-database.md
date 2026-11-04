@@ -40,7 +40,7 @@ status 与之前的用户角色一样，用 CHECK 约束限定可用值。
 
 这整个数组保存在一行文章的 content_blocks 字段中，数组元素顺序也被保留。
 MySQL 的 JSON 类型会校验 JSON 格式；额外的 JSON_TYPE(...)= 'ARRAY' 约束要求顶层是数组。
-它不会自动检查每个块是否有 type、text 等字段，这些内容规则由后续 Java 代码处理。
+数据库不会自动检查每个块是否有 type、text 等字段；当前 Java 的 ContentBlockReader 已根据内容块模型处理这些规则。
 
 SQL 的字符串外层用单引号，内部 JSON 属性名和字符串使用双引号：
 

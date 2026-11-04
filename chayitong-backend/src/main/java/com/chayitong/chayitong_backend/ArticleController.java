@@ -17,8 +17,10 @@ public class ArticleController {
   }
 
   @GetMapping("/api/articles")
-  public ArticlePageResponse list(@Valid @ModelAttribute PageRequest pagination) {
-    return articleService.listPublished(pagination.getPage(), pagination.getPageSize());
+  public ArticlePageResponse list(@Valid @ModelAttribute ArticleFilterRequest filter,
+      @Valid @ModelAttribute PageRequest pagination) {
+    return articleService.listPublished(filter.getCategory(), filter.getKeyword(),
+        pagination.getPage(), pagination.getPageSize());
   }
 
   @GetMapping("/api/articles/{id}")
