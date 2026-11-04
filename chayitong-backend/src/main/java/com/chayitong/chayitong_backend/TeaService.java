@@ -8,11 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TeaService {
 
-  private final TeaRepository teaRepository;
   private final TeaMapper teaMapper;
 
-  public TeaService(TeaRepository teaRepository, TeaMapper teaMapper) {
-    this.teaRepository = teaRepository;
+  public TeaService(TeaMapper teaMapper) {
     this.teaMapper = teaMapper;
   }
 
@@ -38,9 +36,8 @@ public class TeaService {
   }
 
   public TeaResponse createTea(String id, String name, String type) {
-    TeaResponse tea = new TeaResponse(id, name, type);
-    teaRepository.insert(tea);
-    return tea;
+    teaMapper.insert(newTeaEntity(id, name, type));
+    return new TeaResponse(id, name, type);
   }
 
   // 由控制器调用这个方法，Spring 为整批写入开启同一个事务。
@@ -53,13 +50,22 @@ public class TeaService {
     return teas;
   }
 
+  @Transactional
   public TeaResponse updateTea(String id, String name, String type) {
-    teaRepository.update(id, name, type);
+    teaMapper.updateById(newTeaEntity(id, name, type));
     // 回查实际记录：编号不存在时返回 null；值未变化时仍然返回现有记录。
-    return teaRepository.findById(id);
+    return findById(id);
   }
 
   public boolean deleteTea(String id) {
-    return teaRepository.deleteById(id) > 0;
+    return teaMapper.deleteById(id) > 0;
+  }
+
+  private TeaEntity newTeaEntity(String id, String name, String type) {
+    TeaEntity tea = new TeaEntity();
+    tea.setId(id);
+    tea.setName(name);
+    tea.setType(type);
+    return tea;
   }
 }

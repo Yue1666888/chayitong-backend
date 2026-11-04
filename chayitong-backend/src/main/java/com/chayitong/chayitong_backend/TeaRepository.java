@@ -32,26 +32,4 @@ public class TeaRepository {
     }
     return teas.get(0);
   }
-
-  public void insert(TeaResponse tea) {
-    // JdbcTemplate.update 可以执行 INSERT、UPDATE、DELETE，并绑定参数。
-    jdbcTemplate.update(
-        "INSERT INTO teas (id, name, type) VALUES (?, ?, ?)",
-        tea.getId(),
-        tea.getName(),
-        tea.getType());
-  }
-
-  public void update(String id, String name, String type) {
-    jdbcTemplate.update(
-        "UPDATE teas SET name = ?, type = ? WHERE id = ?",
-        name,
-        type,
-        id);
-  }
-
-  public int deleteById(String id) {
-    // 返回删除的行数；编号是主键，因此结果是 0 或 1。
-    return jdbcTemplate.update("DELETE FROM teas WHERE id = ?", id);
-  }
 }
