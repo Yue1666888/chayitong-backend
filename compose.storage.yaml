@@ -1,0 +1,18 @@
+name: chayitong-storage
+
+services:
+  storage:
+    image: chrislusf/seaweedfs:4.52
+    command: ["mini", "-dir=/data"]
+    environment:
+      # 仅用于本机练习，和 Spring Boot 的本地默认值对应。
+      AWS_ACCESS_KEY_ID: chayitong-local
+      AWS_SECRET_ACCESS_KEY: chayitong-local-practice
+      S3_BUCKET: chayitong-practice
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - storage-data:/data
+
+volumes:
+  storage-data:
