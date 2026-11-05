@@ -33,9 +33,12 @@ public class AdminStorageController {
   public ResponseEntity<byte[]> download(@RequestParam("key") String key) {
     byte[] bytes = storage.downloadImage(key);
     String filename = key.substring(key.lastIndexOf('/') + 1);
+    // 下载服务只接受 .png 和 .jpg 格式的练习 Key。
+    MediaType contentType = filename.endsWith(".png") ? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+    ContentDisposition disposition = ContentDisposition.attachment().filename(filename).build();
     return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(filename).toString())
+        .contentType(contentType)
+        .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
         .body(bytes);
   }
 
