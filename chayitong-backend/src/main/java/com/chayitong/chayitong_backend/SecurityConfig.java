@@ -66,7 +66,9 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.DELETE, "/api/admin/articles/{id}").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/admin/articles/{id}/publication").hasRole("ADMIN")
             .requestMatchers(HttpMethod.DELETE, "/api/admin/articles/{id}/publication").hasRole("ADMIN")
-            .requestMatchers("/api/admin/storage/images").hasRole("ADMIN")
+            .requestMatchers("/api/admin/storage/images", "/api/admin/storage/documents",
+                "/api/admin/storage/tea-covers/{teaId}")
+            .hasRole("ADMIN")
             // 包括批量新增及课堂 POST 预览；CSRF 校验继续生效。
             .requestMatchers(HttpMethod.POST, "/api/teas", "/api/teas/**").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/teas", "/api/teas/**").hasRole("ADMIN")

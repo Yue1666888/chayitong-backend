@@ -20,6 +20,7 @@
 | 2 | [04-user-credentials.sql](sql/04-user-credentials.sql) | 建立 `user_credentials` |
 | 3 | [05-user-roles.sql](sql/05-user-roles.sql) | 为 `users` 添加 `role` 字段 |
 | 4 | [06-articles.sql](sql/06-articles.sql) | 建立 `articles` |
+| 5 | [09-tea-cover-key.sql](sql/09-tea-cover-key.sql) | 给 `teas` 增加封面对象 Key 字段 |
 
 在空库里，可用[注册流程](auth-registration.md)建立练习账号，再按[角色练习](user-roles.md)用实际用户编号设置管理员。需要文章样例时使用 [07-articles-demo.sql](sql/07-articles-demo.sql) 并提交事务。茶叶样例可选用 `temp.sql` 中的茶叶插入语句。五张表的结构已通过现有库上的测试核对，空库建表顺序留作手动练习。
 
