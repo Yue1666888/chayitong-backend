@@ -1,5 +1,7 @@
 package com.chayitong.chayitong_backend;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -16,14 +18,16 @@ public class TeaService {
 
   @Transactional(readOnly = true)
   public TeaPageResponse listTeas(String type, String keyword, int page, int pageSize) {
-    // 先转成 long，避免大页码乘以 pageSize 时发生 int 溢出。
-    long offset = ((long) page - 1) * pageSize;
-    String typeFilter = type == null || type.isBlank() ? null : type;
-    String namePattern = keyword == null || keyword.isBlank()
-        ? null : SqlLikePattern.contains(keyword.strip());
-    long total = teaMapper.countMatching(typeFilter, namePattern);
-    return new TeaPageResponse(page, pageSize, total,
-        teaMapper.findPage(typeFilter, namePattern, pageSize, offset));
+    LambdaQueryWrapper<TeaEntity> query = new LambdaQueryWrapper<>();
+    query.eq(type != null && !type.isBlank(), TeaEntity::getType, type);
+    if (keyword != null && !keyword.isBlank()) {
+      query.apply("name LIKE {0} ESCAPE '!'", SqlLikePattern.contains(keyword.strip()));
+    }
+    query.orderByAsc(TeaEntity::getId);
+
+    Page<TeaEntity> result = teaMapper.selectPage(new Page<>(page, pageSize), query);
+    List<TeaResponse> items = result.getRecords().stream().map(this::toTeaResponse).toList();
+    return new TeaPageResponse(page, pageSize, result.getTotal(), items);
   }
 
   // 只返回查询结果；HTTP 状态码由控制器决定。
@@ -32,7 +36,7 @@ public class TeaService {
     if (tea == null) {
       return null;
     }
-    return new TeaResponse(tea.getId(), tea.getName(), tea.getType());
+    return toTeaResponse(tea);
   }
 
   public TeaResponse createTea(String id, String name, String type) {
@@ -59,6 +63,10 @@ public class TeaService {
 
   public boolean deleteTea(String id) {
     return teaMapper.deleteById(id) > 0;
+  }
+
+  private TeaResponse toTeaResponse(TeaEntity tea) {
+    return new TeaResponse(tea.getId(), tea.getName(), tea.getType());
   }
 
   private TeaEntity newTeaEntity(String id, String name, String type) {
