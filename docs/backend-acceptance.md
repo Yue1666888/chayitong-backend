@@ -12,7 +12,7 @@
 
 ## 数据库准备
 
-已有练习库直接使用现有 5 张表。只读检查可用 `SHOW TABLES;`。新建空库时，在 DBCode 选中目标库，按下表顺序手动执行建表语句。
+已有练习库可用 `SHOW TABLES;` 核对。新建空库时，在 DBCode 选中目标库，按下表顺序手动执行建表语句。
 
 | 顺序 | SQL | 结果 |
 |---|---|---|
@@ -21,6 +21,7 @@
 | 3 | [05-user-roles.sql](sql/05-user-roles.sql) | 为 `users` 添加 `role` 字段 |
 | 4 | [06-articles.sql](sql/06-articles.sql) | 建立 `articles` |
 | 5 | [09-tea-cover-key.sql](sql/09-tea-cover-key.sql) | 给 `teas` 增加封面对象 Key 字段 |
+| 6 | [11-community-posts.sql](sql/11-community-posts.sql) | 建立茶友圈的 `posts` 表 |
 
 在空库里，可用[注册流程](auth-registration.md)建立练习账号，再按[角色练习](user-roles.md)用实际用户编号设置管理员。需要文章样例时使用 [07-articles-demo.sql](sql/07-articles-demo.sql) 并提交事务。茶叶样例可选用 `temp.sql` 中的茶叶插入语句。五张表的结构已通过现有库上的测试核对，空库建表顺序留作手动练习。
 
