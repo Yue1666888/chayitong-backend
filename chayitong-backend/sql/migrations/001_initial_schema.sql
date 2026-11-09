@@ -1,0 +1,6 @@
+-- 初始基线：茶一统 MySQL 8 数据库，共 24 张表。
+-- 本文件只记录基线来源和执行顺序，不重复包含 CREATE TABLE 语句。
+-- 新数据库依次执行 bootstrap/init.sql、bootstrap/init_data.sql。
+-- 仅需手工建立表结构时执行 schema/00_chayitong_schema.sql，不要与 init.sql 重复执行。
+-- 本基线之后的变更必须新增递增序号脚本；已发布、已执行的迁移不得原地修改。
+-- 执行增量迁移前应备份并验证影响范围；回滚脚本须按变更单独设计，不使用 DROP DATABASE 作为默认回滚。

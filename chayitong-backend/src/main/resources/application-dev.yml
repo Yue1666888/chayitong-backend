@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/chayitong?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USERNAME:chayitong}
+    password: ${DB_PASSWORD:secret}
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+app:
+  shop:
+    demo-payment-enabled: ${APP_SHOP_DEMO_PAYMENT_ENABLED:true}
+
+logging:
+  level:
+    com.chayitong: debug

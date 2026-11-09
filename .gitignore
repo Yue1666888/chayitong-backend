@@ -1,0 +1,4 @@
+.rebuild-backup/
+.env
+**/target/
+*.log
